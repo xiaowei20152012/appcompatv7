@@ -1,0 +1,27 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
+    <declare-styleable name="DefaultTimeBar">
+        <attr name="bar_height" format="dimension"/>
+        <attr name="touch_target_height" format="dimension"/>
+        <attr name="ad_marker_width" format="dimension"/>
+        <attr name="scrubber_enabled_size" format="dimension"/>
+        <attr name="scrubber_disabled_size" format="dimension"/>
+        <attr name="scrubber_dragged_size" format="dimension"/>
+        <attr name="played_color" format="color"/>
+        <attr name="scrubber_color" format="color"/>
+        <attr name="buffered_color" format="color"/>
+        <attr name="unplayed_color" format="color"/>
+        <attr name="ad_marker_color" format="color"/>
+        <attr name="played_ad_marker_color" format="color"/>
+    </declare-styleable>
+
+</resources>
