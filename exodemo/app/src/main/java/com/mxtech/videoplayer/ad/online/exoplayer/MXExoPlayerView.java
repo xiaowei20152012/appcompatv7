@@ -9,9 +9,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.util.AttributeSet;
@@ -67,6 +64,10 @@ public class MXExoPlayerView extends FrameLayout {
     private boolean controllerAutoShow;
     private boolean controllerHideOnTouch;
 
+    private Activity context;
+    private boolean fullscreen = false;
+    private MXExoControlView.OnClickControlListener onClickControlListener;
+
     public MXExoPlayerView(Context context) {
         this(context, null);
     }
@@ -77,6 +78,7 @@ public class MXExoPlayerView extends FrameLayout {
 
     public MXExoPlayerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.context = (Activity) context;
         if (isInEditMode()) {
             contentFrame = null;
             shutterView = null;
@@ -151,6 +153,7 @@ public class MXExoPlayerView extends FrameLayout {
         } else {
             this.controller = null;
         }
+        this.controller.setOnControlListener(clickControlListener);
         this.controllerShowTimeoutMs = controller != null ? controllerShowTimeoutMs : 0;
         this.controllerHideOnTouch = controllerHideOnTouch;
         this.controllerAutoShow = controllerAutoShow;
@@ -198,6 +201,9 @@ public class MXExoPlayerView extends FrameLayout {
             hideController();
             hideArtwork();
         }
+    }
+    public void setOnClickControlListener(MXExoControlView.OnClickControlListener onClickControlListener){
+        this.onClickControlListener = onClickControlListener;
     }
 
     @Override
@@ -388,7 +394,8 @@ public class MXExoPlayerView extends FrameLayout {
                                        float pixelWidthHeightRatio) {
             if (contentFrame != null) {
                 float aspectRatio = height == 0 ? 1 : (width * pixelWidthHeightRatio) / height;
-                contentFrame.setAspectRatio(aspectRatio);
+                //TODO 动态改变视频高度
+//                contentFrame.setAspectRatio(aspectRatio);
             }
         }
 
@@ -443,39 +450,43 @@ public class MXExoPlayerView extends FrameLayout {
 
     }
 
-    private Activity context;
 
+    MXExoControlView.OnClickControlListener clickControlListener = new MXExoControlView.OnClickControlListener() {
+        @Override
+        public void onClick(Object object, int clickType) {
+            switch (clickType) {
+                case MXExoControlView.OnClickControlListener.CLICK_FULLSCREEN:
+                    setFullScreen();
+                    fullscreen = true;
+                    break;
+                case MXExoControlView.OnClickControlListener.CLICK_UNFULLSCREEN:
+                    setNormalScreen();
+                    fullscreen = false;
+                    break;
+                case MXExoControlView.OnClickControlListener.CLICK_BACK:
+                    if (onClickControlListener!=null){
+                        onClickControlListener.onClick(null,MXExoControlView.OnClickControlListener.CLICK_BACK);
+                    }
+                    break;
+                case MXExoControlView.OnClickControlListener.CLICK_MORE:
+                    if (onClickControlListener!=null){
+                        onClickControlListener.onClick(null,MXExoControlView.OnClickControlListener.CLICK_MORE);
+                    }
+                    break;
+                default:
+
+            }
+        }
+    };
 
     public void setFullScreen() {
         hideActionBar();
         context.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        ViewGroup contentView = (ViewGroup) context
-                .findViewById(android.R.id.content);
-
-        this.removeView(contentFrame);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        contentView.addView(contentFrame, params);
-//        if (fullscreenListener != null) {
-//            fullscreenListener.onFullscreen(true);
-//        }
     }
 
     private void setNormalScreen() {
         showActionBar();
         scanForActivity(context).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        ViewGroup contentView = (ViewGroup) context
-                .findViewById(android.R.id.content);
-        contentView.removeView(contentFrame);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        this.addView(contentFrame, params);
-//        if (fullscreenListener != null) {
-//            fullscreenListener.onFullscreen(false);
-//        }
     }
 
     public static Activity scanForActivity(Context context) {
@@ -492,22 +503,12 @@ public class MXExoPlayerView extends FrameLayout {
 
     @SuppressLint("RestrictedApi")
     public void showActionBar() {
-        ActionBar ab = getAppCompActivity(context).getSupportActionBar();
-        if (ab != null) {
-            ab.setShowHideAnimationEnabled(false);
-            ab.show();
-        }
         context.getWindow()
                 .clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     @SuppressLint("RestrictedApi")
     public void hideActionBar() {
-        ActionBar ab = getAppCompActivity(context).getSupportActionBar();
-        if (ab != null) {
-            ab.setShowHideAnimationEnabled(false);
-            ab.hide();
-        }
         context.getWindow()
                 .setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                         WindowManager.LayoutParams.FLAG_FULLSCREEN);

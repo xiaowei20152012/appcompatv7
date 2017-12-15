@@ -12,6 +12,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.exodemo.R;
@@ -37,18 +38,14 @@ public class MXExoControlView extends FrameLayout {
         ExoPlayerLibraryInfo.registerModule("goog.exo.ui");
     }
 
+    private OnClickControlListener controlListener;
+
     public interface VisibilityListener {
 
         void onVisibilityChange(int visibility);
 
     }
 
-//    public interface OnClickListener {
-//        int CLICK_SHARE = 0x1;
-//        int CLICK_WATCHLIST = 0x2;
-//        int CLICK_UNWATCHLIST = 0x3;
-//        void onClick(Object object,int clickType);
-//    }
 
     public interface ControlDispatcher {
 
@@ -113,7 +110,9 @@ public class MXExoControlView extends FrameLayout {
     private final View nextButton;
     private final View playButton;
     private final View pauseButton;
-//    private final TextView repeatToggleButton;
+    private final View fullImageButton;
+    private final View unFullImageButton;
+    //    private final TextView repeatToggleButton;
     private final TextView durationView;
     private final TextView positionView;
     private final TimeBar timeBar;
@@ -181,28 +180,22 @@ public class MXExoControlView extends FrameLayout {
         LayoutInflater.from(context).inflate(controllerLayoutId, this);
         setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
 
-        durationView = (TextView) findViewById(R.id.mx_exo_duration);
-        positionView = (TextView) findViewById(R.id.mx_exo_position);
-        timeBar = (TimeBar) findViewById(R.id.exo_progress);
-        if (timeBar != null) {
-            timeBar.setListener(componentListener);
-        }
+        durationView = findViewById(R.id.mx_exo_duration);
+        positionView = findViewById(R.id.mx_exo_position);
+        timeBar = findViewById(R.id.exo_progress);
+        timeBar.setListener(componentListener);
         playButton = findViewById(R.id.mx_exo_play);
-        if (playButton != null) {
-            playButton.setOnClickListener(componentListener);
-        }
+        playButton.setOnClickListener(componentListener);
         pauseButton = findViewById(R.id.mx_exo_pause);
-        if (pauseButton != null) {
-            pauseButton.setOnClickListener(componentListener);
-        }
+        pauseButton.setOnClickListener(componentListener);
         previousButton = findViewById(R.id.mx_exo_prev);
-        if (previousButton != null) {
-            previousButton.setOnClickListener(componentListener);
-        }
+        previousButton.setOnClickListener(componentListener);
         nextButton = findViewById(R.id.mx_exo_next);
-        if (nextButton != null) {
-            nextButton.setOnClickListener(componentListener);
-        }
+        nextButton.setOnClickListener(componentListener);
+        fullImageButton = findViewById(R.id.mx_exo_fullscreen);
+        fullImageButton.setOnClickListener(componentListener);
+        unFullImageButton = findViewById(R.id.mx_exo_unfullscreen);
+        unFullImageButton.setOnClickListener(componentListener);
 //        repeatToggleButton = findViewById(R.id.mx_exo_repeat_toggle);
 //        if (repeatToggleButton != null) {
 //            repeatToggleButton.setOnClickListener(componentListener);
@@ -717,6 +710,18 @@ public class MXExoControlView extends FrameLayout {
                     controlDispatcher.dispatchSetPlayWhenReady(player, true);
                 } else if (pauseButton == view) {
                     controlDispatcher.dispatchSetPlayWhenReady(player, false);
+                } else if (fullImageButton == view) {
+                    if (controlListener != null) {
+                        fullImageButton.setVisibility(GONE);
+                        unFullImageButton.setVisibility(VISIBLE);
+                        controlListener.onClick(view, OnClickControlListener.CLICK_FULLSCREEN);
+                    }
+                } else if (unFullImageButton == view) {
+                    if (controlListener != null) {
+                        fullImageButton.setVisibility(VISIBLE);
+                        unFullImageButton.setVisibility(GONE);
+                        controlListener.onClick(view, OnClickControlListener.CLICK_UNFULLSCREEN);
+                    }
                 }
 //                else if (repeatToggleButton == view) {
 //                    controlDispatcher.dispatchSetRepeatMode(player, RepeatModeUtil.getNextRepeatMode(
@@ -725,6 +730,22 @@ public class MXExoControlView extends FrameLayout {
             }
             hideAfterTimeout();
         }
-
     }
+
+    public void setOnControlListener(OnClickControlListener controlListener) {
+        this.controlListener = controlListener;
+    }
+
+    public interface OnClickControlListener {
+        int CLICK_SHARE = 0x1;
+        int CLICK_WATCHLIST = 0x2;
+        int CLICK_UNWATCHLIST = 0x3;
+        int CLICK_FULLSCREEN = 0x4;
+        int CLICK_UNFULLSCREEN = 0x5;
+        int CLICK_BACK = 0x6;
+        int CLICK_MORE = 0x7;
+
+        void onClick(Object object, int clickType);
+    }
+
 }

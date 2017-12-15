@@ -123,7 +123,14 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="13dp"
             android:src="@drawable/exo_player_enlarge" />
-
+        <ImageView
+            android:id="@+id/mx_exo_unfullscreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:visibility="gone"
+            android:layout_marginRight="13dp"
+            android:src="@drawable/exo_player_shrink" />
     </LinearLayout>
 
 </FrameLayout>
