@@ -437,6 +437,12 @@ public class RhapsodyPlayer implements Player.EventListener, SimpleExoPlayer.Vid
         }
         return Player.STATE_IDLE;
     }
+    public SimpleExoPlayer getPlayer(){
+        if (mPlayer!=null){
+            return mPlayer;
+        }
+        return null;
+    }
     /**
      * Checks whether the MediaPlayer is playing.
      *

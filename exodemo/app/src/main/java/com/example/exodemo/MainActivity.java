@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.JsonReader;
 import android.util.Log;
@@ -26,7 +25,7 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.util.Util;
-import com.mxtech.videoplayer.ad.online.exoplayer.MXExoPlayerActivity;
+import com.mxtech.videoplayer.ad.online.exoplayer.MXExoBaseActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -376,12 +375,12 @@ public class MainActivity extends Activity {
 
         public Intent buildIntent(Context context) {
 //            Intent intent = new Intent();
-            Intent intent = new Intent(context, MXExoPlayerActivity.class);
-            intent.putExtra(MXExoPlayerActivity.PREFER_EXTENSION_DECODERS, preferExtensionDecoders);
+            Intent intent = new Intent(context, MXExoBaseActivity.class);
+            intent.putExtra(MXExoBaseActivity.PREFER_EXTENSION_DECODERS, preferExtensionDecoders);
             if (drmSchemeUuid != null) {
-                intent.putExtra(MXExoPlayerActivity.DRM_SCHEME_UUID_EXTRA, drmSchemeUuid.toString());
-                intent.putExtra(MXExoPlayerActivity.DRM_LICENSE_URL, drmLicenseUrl);
-                intent.putExtra(MXExoPlayerActivity.DRM_KEY_REQUEST_PROPERTIES, drmKeyRequestProperties);
+                intent.putExtra(MXExoBaseActivity.DRM_SCHEME_UUID_EXTRA, drmSchemeUuid.toString());
+                intent.putExtra(MXExoBaseActivity.DRM_LICENSE_URL, drmLicenseUrl);
+                intent.putExtra(MXExoBaseActivity.DRM_KEY_REQUEST_PROPERTIES, drmKeyRequestProperties);
             }
             return intent;
         }
@@ -407,8 +406,8 @@ public class MainActivity extends Activity {
         public Intent buildIntent(Context context) {
             return super.buildIntent(context)
                     .setData(Uri.parse(uri))
-                    .putExtra(MXExoPlayerActivity.EXTENSION_EXTRA, extension)
-                    .setAction(MXExoPlayerActivity.ACTION_VIEW);
+                    .putExtra(MXExoBaseActivity.EXTENSION_EXTRA, extension)
+                    .setAction(MXExoBaseActivity.ACTION_VIEW);
         }
 
     }
@@ -433,9 +432,9 @@ public class MainActivity extends Activity {
                 extensions[i] = children[i].extension;
             }
             return super.buildIntent(context)
-                    .putExtra(MXExoPlayerActivity.URI_LIST_EXTRA, uris)
-                    .putExtra(MXExoPlayerActivity.EXTENSION_LIST_EXTRA, extensions)
-                    .setAction(MXExoPlayerActivity.ACTION_VIEW_LIST);
+                    .putExtra(MXExoBaseActivity.URI_LIST_EXTRA, uris)
+                    .putExtra(MXExoBaseActivity.EXTENSION_LIST_EXTRA, extensions)
+                    .setAction(MXExoBaseActivity.ACTION_VIEW_LIST);
         }
 
     }

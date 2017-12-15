@@ -52,8 +52,8 @@ public final class AspectRatioFrameLayout extends FrameLayout {
    * to reduce power consumption.
    */
   private static final float MAX_ASPECT_RATIO_DEFORMATION_FRACTION = 0.01f;
-
-  private float videoAspectRatio;
+  /*heigth/width*/
+  private float videoAspectRatio = 1.78f;
   private int resizeMode;
 
   public AspectRatioFrameLayout(Context context) {

@@ -1,12 +1,19 @@
 package com.mxtech.videoplayer.ad.online.exoplayer;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -15,6 +22,7 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -33,7 +41,6 @@ import com.google.android.exoplayer2.text.TextRenderer;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.util.Assertions;
-import com.google.android.exoplayer2.util.RepeatModeUtil;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.List;
@@ -434,6 +441,94 @@ public class MXExoPlayerView extends FrameLayout {
             // Do nothing.
         }
 
+    }
+
+    private Activity context;
+
+
+    public void setFullScreen() {
+        hideActionBar();
+        context.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        ViewGroup contentView = (ViewGroup) context
+                .findViewById(android.R.id.content);
+
+        this.removeView(contentFrame);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        contentView.addView(contentFrame, params);
+//        if (fullscreenListener != null) {
+//            fullscreenListener.onFullscreen(true);
+//        }
+    }
+
+    private void setNormalScreen() {
+        showActionBar();
+        scanForActivity(context).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        ViewGroup contentView = (ViewGroup) context
+                .findViewById(android.R.id.content);
+        contentView.removeView(contentFrame);
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        this.addView(contentFrame, params);
+//        if (fullscreenListener != null) {
+//            fullscreenListener.onFullscreen(false);
+//        }
+    }
+
+    public static Activity scanForActivity(Context context) {
+        if (context == null) {
+            return null;
+        }
+        if (context instanceof Activity) {
+            return (Activity) context;
+        } else if (context instanceof ContextWrapper) {
+            return scanForActivity(((ContextWrapper) context).getBaseContext());
+        }
+        return null;
+    }
+
+    @SuppressLint("RestrictedApi")
+    public void showActionBar() {
+        ActionBar ab = getAppCompActivity(context).getSupportActionBar();
+        if (ab != null) {
+            ab.setShowHideAnimationEnabled(false);
+            ab.show();
+        }
+        context.getWindow()
+                .clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
+    @SuppressLint("RestrictedApi")
+    public void hideActionBar() {
+        ActionBar ab = getAppCompActivity(context).getSupportActionBar();
+        if (ab != null) {
+            ab.setShowHideAnimationEnabled(false);
+            ab.hide();
+        }
+        context.getWindow()
+                .setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
+    /**
+     * Get AppCompatActivity from context
+     *
+     * @param context
+     * @return AppCompatActivity if it's not null
+     */
+    private static AppCompatActivity getAppCompActivity(Context context) {
+        if (context == null) {
+            return null;
+        }
+        if (context instanceof AppCompatActivity) {
+            return (AppCompatActivity) context;
+        } else if (context instanceof ContextThemeWrapper) {
+            return getAppCompActivity(((ContextThemeWrapper) context).getBaseContext());
+        }
+        return null;
     }
 
 }

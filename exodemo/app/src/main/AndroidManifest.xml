@@ -44,7 +44,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.mxtech.videoplayer.ad.online.exoplayer.MXExoPlayerActivity"
+        <activity android:name="com.mxtech.videoplayer.ad.online.exoplayer.MXExoBaseActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
             android:launchMode="singleTop">
             <intent-filter>

@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layoutDirection="ltr"
     android:orientation="vertical">
 
@@ -13,80 +14,93 @@
         android:orientation="horizontal"
         android:paddingTop="4dp">
 
-        <TextView
+        <ImageView
             android:id="@+id/mx_exo_prev"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="prev"
-            android:textColor="@color/colorPrimaryDark" />
+            android:src="@drawable/exo_controls_previous" />
 
-        <TextView
-            android:id="@+id/mx_exo_rew"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:text="rew" />
-
-        <TextView
-            android:id="@+id/mx_exo_repeat_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:text="toggle" />
-
-        <TextView
+        <ImageView
             android:id="@+id/mx_exo_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="play" />
+            android:src="@drawable/exo_controls_play" />
 
-        <TextView
+        <ImageView
             android:id="@+id/mx_exo_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="pause" />
+            android:src="@drawable/exo_controls_pause" />
 
-        <TextView
-            android:id="@+id/mx_exo_ffwd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:text="ffwd" />
-
-        <TextView
+        <ImageView
             android:id="@+id/mx_exo_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="next" />
+            android:src="@drawable/exo_controls_next" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
+        android:background="#7f000000"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/mx_exo_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/exo_player_back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0" />
+
+        <ImageView
+            android:id="@+id/mx_exo_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/exo_player_back" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
         android:layout_gravity="bottom"
+        android:background="#7F000000"
         android:gravity="center"
-        android:background="#000"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/mx_exo_position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:includeFontPadding="false"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
-            android:textColor="#FFBEBEBE"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textColor="#FFFFFFFF"
+            android:textSize="16sp" />
 
         <com.mxtech.videoplayer.ad.online.exoplayer.DefaultTimeBar
             android:id="@+id/exo_progress"
             android:layout_width="0dp"
+            app:played_color="#FFFFB70D"
+            app:unplayed_color="#4DFFFFFF"
+            app:buffered_color="#80FFFFFF"
+            app:bar_height="2dp"
+            app:scrubber_color="#FFB70D"
             android:layout_height="26dp"
             android:layout_weight="1" />
 
@@ -94,39 +108,22 @@
             android:id="@+id/mx_exo_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:includeFontPadding="false"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
-            android:textColor="#FFBEBEBE"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textColor="#FFFFFFFF"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/mx_exo_fullscreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="13dp"
+            android:src="@drawable/exo_player_enlarge" />
 
     </LinearLayout>
-    <!--<TextView android:id="@id/exo_position"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="14sp"
-    android:textStyle="bold"
-    android:paddingLeft="4dp"
-    android:paddingRight="4dp"
-    android:includeFontPadding="false"
-    android:textColor="#FFBEBEBE"/>
-
-  <com.google.android.exoplayer2.ui.DefaultTimeBar
-    android:id="@id/exo_progress"
-    android:layout_width="0dp"
-    android:layout_weight="1"
-    android:layout_height="26dp"/>
-
-  <TextView android:id="@id/mx_exo_duration"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="14sp"
-    android:textStyle="bold"
-    android:paddingLeft="4dp"
-    android:paddingRight="4dp"
-    android:includeFontPadding="false"
-    android:textColor="#FFBEBEBE"/>
--->
 
 </FrameLayout>

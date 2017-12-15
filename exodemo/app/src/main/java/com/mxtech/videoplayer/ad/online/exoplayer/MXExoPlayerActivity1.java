@@ -59,7 +59,7 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.UUID;
 
-public class MXExoPlayerActivity extends Activity implements OnClickListener, EventListener,
+public class MXExoPlayerActivity1 extends Activity implements OnClickListener, EventListener,
         MXExoControlView.VisibilityListener {
 
     public static final String DRM_SCHEME_UUID_EXTRA = "drm_scheme_uuid";

@@ -43,6 +43,13 @@ public class MXExoControlView extends FrameLayout {
 
     }
 
+//    public interface OnClickListener {
+//        int CLICK_SHARE = 0x1;
+//        int CLICK_WATCHLIST = 0x2;
+//        int CLICK_UNWATCHLIST = 0x3;
+//        void onClick(Object object,int clickType);
+//    }
+
     public interface ControlDispatcher {
 
         boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady);
@@ -106,7 +113,7 @@ public class MXExoControlView extends FrameLayout {
     private final View nextButton;
     private final View playButton;
     private final View pauseButton;
-    private final TextView repeatToggleButton;
+//    private final TextView repeatToggleButton;
     private final TextView durationView;
     private final TextView positionView;
     private final TimeBar timeBar;
@@ -196,10 +203,10 @@ public class MXExoControlView extends FrameLayout {
         if (nextButton != null) {
             nextButton.setOnClickListener(componentListener);
         }
-        repeatToggleButton = findViewById(R.id.mx_exo_repeat_toggle);
-        if (repeatToggleButton != null) {
-            repeatToggleButton.setOnClickListener(componentListener);
-        }
+//        repeatToggleButton = findViewById(R.id.mx_exo_repeat_toggle);
+//        if (repeatToggleButton != null) {
+//            repeatToggleButton.setOnClickListener(componentListener);
+//        }
         Resources resources = context.getResources();
     }
 
@@ -277,7 +284,7 @@ public class MXExoControlView extends FrameLayout {
     private void updateAll() {
         updatePlayPauseButton();
         updateNavigation();
-        updateRepeatModeButton();
+//        updateRepeatModeButton();
         updateProgress();
     }
 
@@ -331,21 +338,21 @@ public class MXExoControlView extends FrameLayout {
         }
     }
 
-    private void updateRepeatModeButton() {
-        if (!isVisible() || !isAttachedToWindow || repeatToggleButton == null) {
-            return;
-        }
-        if (repeatToggleModes == RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE) {
-            repeatToggleButton.setVisibility(View.GONE);
-            return;
-        }
-        if (player == null) {
-            setButtonEnabled(false, repeatToggleButton);
-            return;
-        }
-        setButtonEnabled(true, repeatToggleButton);
-        repeatToggleButton.setVisibility(View.VISIBLE);
-    }
+//    private void updateRepeatModeButton() {
+//        if (!isVisible() || !isAttachedToWindow || repeatToggleButton == null) {
+//            return;
+//        }
+//        if (repeatToggleModes == RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE) {
+//            repeatToggleButton.setVisibility(View.GONE);
+//            return;
+//        }
+//        if (player == null) {
+//            setButtonEnabled(false, repeatToggleButton);
+//            return;
+//        }
+//        setButtonEnabled(true, repeatToggleButton);
+//        repeatToggleButton.setVisibility(View.VISIBLE);
+//    }
 
     private void updateTimeBarMode() {
         if (player == null) {
@@ -662,7 +669,7 @@ public class MXExoControlView extends FrameLayout {
 
         @Override
         public void onRepeatModeChanged(int repeatMode) {
-            updateRepeatModeButton();
+//            updateRepeatModeButton();
             updateNavigation();
         }
 
@@ -710,10 +717,11 @@ public class MXExoControlView extends FrameLayout {
                     controlDispatcher.dispatchSetPlayWhenReady(player, true);
                 } else if (pauseButton == view) {
                     controlDispatcher.dispatchSetPlayWhenReady(player, false);
-                } else if (repeatToggleButton == view) {
-                    controlDispatcher.dispatchSetRepeatMode(player, RepeatModeUtil.getNextRepeatMode(
-                            player.getRepeatMode(), repeatToggleModes));
                 }
+//                else if (repeatToggleButton == view) {
+//                    controlDispatcher.dispatchSetRepeatMode(player, RepeatModeUtil.getNextRepeatMode(
+//                            player.getRepeatMode(), repeatToggleModes));
+//                }
             }
             hideAfterTimeout();
         }
