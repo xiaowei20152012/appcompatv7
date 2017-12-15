@@ -151,23 +151,6 @@ public class MXExoPlayerView extends FrameLayout {
         hideController();
     }
 
-    public static void switchTargetView(@NonNull SimpleExoPlayer player,
-                                        @Nullable MXExoPlayerView oldPlayerView, @Nullable MXExoPlayerView newPlayerView) {
-        if (oldPlayerView == newPlayerView) {
-            return;
-        }
-        // We attach the new view before detaching the old one because this ordering allows the player
-        // to swap directly from one surface to another, without transitioning through a state where no
-        // surface is attached. This is significantly more efficient and achieves a more seamless
-        // transition when using platform provided video decoders.
-        if (newPlayerView != null) {
-            newPlayerView.setPlayer(player);
-        }
-        if (oldPlayerView != null) {
-            oldPlayerView.setPlayer(null);
-        }
-    }
-
     public SimpleExoPlayer getPlayer() {
         return player;
     }
@@ -216,52 +199,6 @@ public class MXExoPlayerView extends FrameLayout {
         if (surfaceView instanceof SurfaceView) {
             // Work around https://github.com/google/ExoPlayer/issues/3160
             surfaceView.setVisibility(visibility);
-        }
-    }
-
-    public void setResizeMode(@AspectRatioFrameLayout.ResizeMode int resizeMode) {
-        Assertions.checkState(contentFrame != null);
-        contentFrame.setResizeMode(resizeMode);
-    }
-
-    public boolean getUseArtwork() {
-        return useArtwork;
-    }
-
-    public void setUseArtwork(boolean useArtwork) {
-        Assertions.checkState(!useArtwork || artworkView != null);
-        if (this.useArtwork != useArtwork) {
-            this.useArtwork = useArtwork;
-            updateForCurrentTrackSelections();
-        }
-    }
-
-    public Bitmap getDefaultArtwork() {
-        return defaultArtwork;
-    }
-
-    public void setDefaultArtwork(Bitmap defaultArtwork) {
-        if (this.defaultArtwork != defaultArtwork) {
-            this.defaultArtwork = defaultArtwork;
-            updateForCurrentTrackSelections();
-        }
-    }
-
-    public boolean getUseController() {
-        return useController;
-    }
-
-    public void setUseController(boolean useController) {
-        Assertions.checkState(!useController || controller != null);
-        if (this.useController == useController) {
-            return;
-        }
-        this.useController = useController;
-        if (useController) {
-            controller.setPlayer(player);
-        } else if (controller != null) {
-            controller.hide();
-            controller.setPlayer(null);
         }
     }
 

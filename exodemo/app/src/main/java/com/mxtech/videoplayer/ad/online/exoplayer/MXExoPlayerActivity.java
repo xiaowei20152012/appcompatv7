@@ -2,7 +2,6 @@ package com.mxtech.videoplayer.ad.online.exoplayer;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -13,9 +12,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.exodemo.R;
@@ -57,8 +54,6 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -90,7 +85,7 @@ public class MXExoPlayerActivity extends Activity implements OnClickListener, Ev
 
     private Handler mainHandler;
     private MXEventLogger eventLogger;
-    private MXExoPlayerView simpleExoPlayerView;
+    private MXExoPlayerView exoPlayerView;
 
     private DataSource.Factory mediaDataSourceFactory;
     private SimpleExoPlayer player;
@@ -117,9 +112,9 @@ public class MXExoPlayerActivity extends Activity implements OnClickListener, Ev
         View rootView = findViewById(R.id.root);
         rootView.setOnClickListener(this);
 
-        simpleExoPlayerView = (MXExoPlayerView) findViewById(R.id.player_view);
-        simpleExoPlayerView.setControllerVisibilityListener(this);
-        simpleExoPlayerView.requestFocus();
+        exoPlayerView = findViewById(R.id.player_view);
+        exoPlayerView.setControllerVisibilityListener(this);
+        exoPlayerView.requestFocus();
     }
 
     @Override
@@ -181,7 +176,7 @@ public class MXExoPlayerActivity extends Activity implements OnClickListener, Ev
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         // If the event was not handled then see if the player view can handle it.
-        return super.dispatchKeyEvent(event) || simpleExoPlayerView.dispatchKeyEvent(event);
+        return super.dispatchKeyEvent(event) || exoPlayerView.dispatchKeyEvent(event);
     }
 
     @Override
@@ -242,7 +237,7 @@ public class MXExoPlayerActivity extends Activity implements OnClickListener, Ev
             player.addMetadataOutput(eventLogger);
             player.setAudioDebugListener(eventLogger);
             player.setVideoDebugListener(eventLogger);
-            simpleExoPlayerView.setPlayer(player);
+            exoPlayerView.setPlayer(player);
             player.setPlayWhenReady(shouldAutoPlay);
         }
         String action = intent.getAction();

@@ -106,8 +106,6 @@ public class MXExoControlView extends FrameLayout {
     private final View nextButton;
     private final View playButton;
     private final View pauseButton;
-//    private final View fastForwardButton;
-//    private final View rewindButton;
     private final TextView repeatToggleButton;
     private final TextView durationView;
     private final TextView positionView;
@@ -198,14 +196,6 @@ public class MXExoControlView extends FrameLayout {
         if (nextButton != null) {
             nextButton.setOnClickListener(componentListener);
         }
-//        rewindButton = findViewById(R.id.mx_exo_rew);
-//        if (rewindButton != null) {
-//            rewindButton.setOnClickListener(componentListener);
-//        }
-//        fastForwardButton = findViewById(R.id.mx_exo_ffwd);
-//        if (fastForwardButton != null) {
-//            fastForwardButton.setOnClickListener(componentListener);
-//        }
         repeatToggleButton = findViewById(R.id.mx_exo_repeat_toggle);
         if (repeatToggleButton != null) {
             repeatToggleButton.setOnClickListener(componentListener);
@@ -231,28 +221,8 @@ public class MXExoControlView extends FrameLayout {
         updateAll();
     }
 
-    public void setShowMultiWindowTimeBar(boolean showMultiWindowTimeBar) {
-        this.showMultiWindowTimeBar = showMultiWindowTimeBar;
-        updateTimeBarMode();
-    }
-
     public void setVisibilityListener(VisibilityListener listener) {
         this.visibilityListener = listener;
-    }
-
-    public void setControlDispatcher(ControlDispatcher controlDispatcher) {
-        this.controlDispatcher = controlDispatcher == null ? DEFAULT_CONTROL_DISPATCHER
-                : controlDispatcher;
-    }
-
-    public void setRewindIncrementMs(int rewindMs) {
-        this.rewindMs = rewindMs;
-        updateNavigation();
-    }
-
-    public void setFastForwardIncrementMs(int fastForwardMs) {
-        this.fastForwardMs = fastForwardMs;
-        updateNavigation();
     }
 
     public int getShowTimeoutMs() {
@@ -261,28 +231,6 @@ public class MXExoControlView extends FrameLayout {
 
     public void setShowTimeoutMs(int showTimeoutMs) {
         this.showTimeoutMs = showTimeoutMs;
-    }
-
-    public @RepeatModeUtil.RepeatToggleModes
-    int getRepeatToggleModes() {
-        return repeatToggleModes;
-    }
-
-    public void setRepeatToggleModes(@RepeatModeUtil.RepeatToggleModes int repeatToggleModes) {
-        this.repeatToggleModes = repeatToggleModes;
-        if (player != null) {
-            @Player.RepeatMode int currentMode = player.getRepeatMode();
-            if (repeatToggleModes == RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
-                    && currentMode != Player.REPEAT_MODE_OFF) {
-                controlDispatcher.dispatchSetRepeatMode(player, Player.REPEAT_MODE_OFF);
-            } else if (repeatToggleModes == RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
-                    && currentMode == Player.REPEAT_MODE_ALL) {
-                controlDispatcher.dispatchSetRepeatMode(player, Player.REPEAT_MODE_ONE);
-            } else if (repeatToggleModes == RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
-                    && currentMode == Player.REPEAT_MODE_ONE) {
-                controlDispatcher.dispatchSetRepeatMode(player, Player.REPEAT_MODE_ALL);
-            }
-        }
     }
 
     public void show() {
@@ -396,20 +344,6 @@ public class MXExoControlView extends FrameLayout {
             return;
         }
         setButtonEnabled(true, repeatToggleButton);
-        switch (player.getRepeatMode()) {
-            case Player.REPEAT_MODE_OFF:
-//                repeatToggleButton.setImageDrawable(repeatOffButtonDrawable);
-//                repeatToggleButton.setContentDescription(repeatOffButtonContentDescription);
-                break;
-            case Player.REPEAT_MODE_ONE:
-//                repeatToggleButton.setImageDrawable(repeatOneButtonDrawable);
-//                repeatToggleButton.setContentDescription(repeatOneButtonContentDescription);
-                break;
-            case Player.REPEAT_MODE_ALL:
-//                repeatToggleButton.setImageDrawable(repeatAllButtonDrawable);
-//                repeatToggleButton.setContentDescription(repeatAllButtonContentDescription);
-                break;
-        }
         repeatToggleButton.setVisibility(View.VISIBLE);
     }
 
@@ -772,10 +706,6 @@ public class MXExoControlView extends FrameLayout {
                     next();
                 } else if (previousButton == view) {
                     previous();
-//                } else if (fastForwardButton == view) {
-//                    fastForward();
-//                } else if (rewindButton == view) {
-//                    rewind();
                 } else if (playButton == view) {
                     controlDispatcher.dispatchSetPlayWhenReady(player, true);
                 } else if (pauseButton == view) {
