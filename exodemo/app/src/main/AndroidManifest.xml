@@ -46,7 +46,8 @@
 
         <activity android:name="com.mxtech.videoplayer.ad.online.exoplayer.MXExoBaseActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="com.google.android.exoplayer.demo.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>

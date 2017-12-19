@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -54,12 +55,13 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
+import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.UUID;
 
-public class MXExoBaseActivity extends Activity implements OnClickListener, EventListener,
+public class MXExoBaseActivity extends AppCompatActivity implements OnClickListener, EventListener,
         MXExoControlView.VisibilityListener {
 
     public static final String DRM_SCHEME_UUID_EXTRA = "drm_scheme_uuid";
@@ -75,23 +77,11 @@ public class MXExoBaseActivity extends Activity implements OnClickListener, Even
     public static final String URI_LIST_EXTRA = "uri_list";
     public static final String EXTENSION_LIST_EXTRA = "extension_list";
 
-    private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
-    private static final CookieManager DEFAULT_COOKIE_MANAGER;
-
-    static {
-        DEFAULT_COOKIE_MANAGER = new CookieManager();
-        DEFAULT_COOKIE_MANAGER.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
-    }
-
     private Handler mainHandler;
-    private MXEventLogger eventLogger;
     private MXExoPlayerView exoPlayerView;
 
-    private DataSource.Factory mediaDataSourceFactory;
     private SimpleExoPlayer player;
-    private DefaultTrackSelector trackSelector;
     private boolean inErrorState;
-    private TrackGroupArray lastSeenTrackGroupArray;
 
     private boolean shouldAutoPlay;
     private int resumeWindow;
@@ -102,11 +92,7 @@ public class MXExoBaseActivity extends Activity implements OnClickListener, Even
         super.onCreate(savedInstanceState);
         shouldAutoPlay = true;
         clearResumePosition();
-        mediaDataSourceFactory = buildDataSourceFactory(true);
         mainHandler = new Handler();
-        if (CookieHandler.getDefault() != DEFAULT_COOKIE_MANAGER) {
-            CookieHandler.setDefault(DEFAULT_COOKIE_MANAGER);
-        }
 
         setContentView(R.layout.activity_player);
         View rootView = findViewById(R.id.root);
@@ -190,56 +176,23 @@ public class MXExoBaseActivity extends Activity implements OnClickListener, Even
     private void initializePlayer() {
         Intent intent = getIntent();
         boolean needNewPlayer = player == null;
-        if (needNewPlayer) {
-            //LOG
-            TrackSelection.Factory adaptiveTrackSelectionFactory =
-                    new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
-            trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
-            lastSeenTrackGroupArray = null;
-            eventLogger = new MXEventLogger(trackSelector);
+        RhapsodyPlayer rhapsodyPlayer = new RhapsodyPlayer();
+        Uri uri = Uri.parse("http://ec2-13-126-99-75.ap-south-1.compute.amazonaws.com:8888/manifest?vid=528153d6c82ca3a77ecb42d09ca8edf5&key=2624711233-0-0-a4149863448932e0db1602ee3da5f4aa&proto=dash&drm=nodrm&cdn=aws&debug=0");
 
-            UUID drmSchemeUuid = intent.hasExtra(DRM_SCHEME_UUID_EXTRA)
-                    ? UUID.fromString(intent.getStringExtra(DRM_SCHEME_UUID_EXTRA)) : null;
-            DrmSessionManager<FrameworkMediaCrypto> drmSessionManager = null;
-            if (drmSchemeUuid != null) {
-                String drmLicenseUrl = intent.getStringExtra(DRM_LICENSE_URL);
-                String[] keyRequestPropertiesArray = intent.getStringArrayExtra(DRM_KEY_REQUEST_PROPERTIES);
-                String errorStringId = "R.string.error_drm_unknown";
-                if (Util.SDK_INT < 18) {
-                    errorStringId = "R.string.error_drm_not_supported";
-                } else {
-                    try {
-                        drmSessionManager = buildDrmSessionManagerV18(drmSchemeUuid, drmLicenseUrl,
-                                keyRequestPropertiesArray);
-                    } catch (UnsupportedDrmException e) {
-                        errorStringId = e.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME
-                                ? "R.string.error_drm_unsupported_scheme" : "R.string.error_drm_unknown";
-                    }
-                }
-                if (drmSessionManager == null) {
-                    showToast(errorStringId);
-                    return;
-                }
-            }
-
-            boolean preferExtensionDecoders = intent.getBooleanExtra(PREFER_EXTENSION_DECODERS, false);
-            @DefaultRenderersFactory.ExtensionRendererMode int extensionRendererMode =
-                    ((DemoApplication) getApplication()).useExtensionRenderers()
-                            ? (preferExtensionDecoders ? DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
-                            : DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
-                            : DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF;
-            DefaultRenderersFactory renderersFactory = new DefaultRenderersFactory(this,
-                    drmSessionManager, extensionRendererMode);
-
-            player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector);
-            player.addListener(this);
-            player.addListener(eventLogger);
-            player.addMetadataOutput(eventLogger);
-            player.setAudioDebugListener(eventLogger);
-            player.setVideoDebugListener(eventLogger);
-            exoPlayerView.setPlayer(player);
-            player.setPlayWhenReady(shouldAutoPlay);
+//            rhapsodyPlayer.setDataSource(getContext(), uri);
+        try {
+            rhapsodyPlayer.setDataSource(this,uri,"mpd");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnsupportedDrmException e) {
+            e.printStackTrace();
         }
+        player = rhapsodyPlayer.getPlayer();
+        exoPlayerView.setPlayer(player);
+        player.setPlayWhenReady(shouldAutoPlay);
+        rhapsodyPlayer.prepare();
+
+
         String action = intent.getAction();
         Uri[] uris;
         String[] extensions;
@@ -264,55 +217,16 @@ public class MXExoBaseActivity extends Activity implements OnClickListener, Even
             // The player will be reinitialized if the permission is granted.
             return;
         }
-        MediaSource[] mediaSources = new MediaSource[uris.length];
-        for (int i = 0; i < uris.length; i++) {
-            mediaSources[i] = buildMediaSource(uris[i], extensions[i]);
-        }
-        MediaSource mediaSource = mediaSources.length == 1 ? mediaSources[0]
-                : new ConcatenatingMediaSource(mediaSources);
+
+
         boolean haveResumePosition = resumeWindow != C.INDEX_UNSET;
         if (haveResumePosition) {
             player.seekTo(resumeWindow, resumePosition);
         }
-        player.prepare(mediaSource, !haveResumePosition, false);
         inErrorState = false;
         updateButtonVisibilities();
     }
 
-    private MediaSource buildMediaSource(Uri uri, String overrideExtension) {
-        int type = TextUtils.isEmpty(overrideExtension) ? Util.inferContentType(uri)
-                : Util.inferContentType("." + overrideExtension);
-        switch (type) {
-            case C.TYPE_SS:
-                return new SsMediaSource(uri, buildDataSourceFactory(false),
-                        new DefaultSsChunkSource.Factory(mediaDataSourceFactory), mainHandler, eventLogger);
-            case C.TYPE_DASH:
-                return new DashMediaSource(uri, buildDataSourceFactory(false),
-                        new DefaultDashChunkSource.Factory(mediaDataSourceFactory), mainHandler, eventLogger);
-            case C.TYPE_HLS:
-                return new HlsMediaSource(uri, mediaDataSourceFactory, mainHandler, eventLogger);
-            case C.TYPE_OTHER:
-                return new ExtractorMediaSource(uri, mediaDataSourceFactory, new DefaultExtractorsFactory(),
-                        mainHandler, eventLogger);
-            default: {
-                throw new IllegalStateException("Unsupported type: " + type);
-            }
-        }
-    }
-
-    private DrmSessionManager<FrameworkMediaCrypto> buildDrmSessionManagerV18(UUID uuid,
-                                                                              String licenseUrl, String[] keyRequestPropertiesArray) throws UnsupportedDrmException {
-        HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(licenseUrl,
-                buildHttpDataSourceFactory(false));
-        if (keyRequestPropertiesArray != null) {
-            for (int i = 0; i < keyRequestPropertiesArray.length - 1; i += 2) {
-                drmCallback.setKeyRequestProperty(keyRequestPropertiesArray[i],
-                        keyRequestPropertiesArray[i + 1]);
-            }
-        }
-        return new DefaultDrmSessionManager<>(uuid, FrameworkMediaDrm.newInstance(uuid), drmCallback,
-                null, mainHandler, eventLogger);
-    }
 
     private void releasePlayer() {
         if (player != null) {
@@ -320,8 +234,6 @@ public class MXExoBaseActivity extends Activity implements OnClickListener, Even
             updateResumePosition();
             player.release();
             player = null;
-            trackSelector = null;
-            eventLogger = null;
         }
     }
 
@@ -335,15 +247,6 @@ public class MXExoBaseActivity extends Activity implements OnClickListener, Even
         resumePosition = C.TIME_UNSET;
     }
 
-    private DataSource.Factory buildDataSourceFactory(boolean useBandwidthMeter) {
-        return ((DemoApplication) getApplication())
-                .buildDataSourceFactory(useBandwidthMeter ? BANDWIDTH_METER : null);
-    }
-
-    private HttpDataSource.Factory buildHttpDataSourceFactory(boolean useBandwidthMeter) {
-        return ((DemoApplication) getApplication())
-                .buildHttpDataSourceFactory(useBandwidthMeter ? BANDWIDTH_METER : null);
-    }
 
     // Player.EventListener implementation
 
@@ -423,20 +326,6 @@ public class MXExoBaseActivity extends Activity implements OnClickListener, Even
     @SuppressWarnings("ReferenceEquality")
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
         updateButtonVisibilities();
-        if (trackGroups != lastSeenTrackGroupArray) {
-            MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
-            if (mappedTrackInfo != null) {
-                if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_VIDEO)
-                        == MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
-                    showToast("R.string.error_unsupported_video");
-                }
-                if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_AUDIO)
-                        == MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
-                    showToast("R.string.error_unsupported_audio");
-                }
-            }
-            lastSeenTrackGroupArray = trackGroups;
-        }
     }
 
     // User controls
@@ -447,34 +336,6 @@ public class MXExoBaseActivity extends Activity implements OnClickListener, Even
             return;
         }
 
-        MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
-        if (mappedTrackInfo == null) {
-            return;
-        }
-
-        for (int i = 0; i < mappedTrackInfo.length; i++) {
-            TrackGroupArray trackGroups = mappedTrackInfo.getTrackGroups(i);
-            if (trackGroups.length != 0) {
-                Button button = new Button(this);
-                String label;
-                switch (player.getRendererType(i)) {
-                    case C.TRACK_TYPE_AUDIO:
-                        label = "R.string.audio";
-                        break;
-                    case C.TRACK_TYPE_VIDEO:
-                        label = "R.string.video";
-                        break;
-                    case C.TRACK_TYPE_TEXT:
-                        label = "R.string.text";
-                        break;
-                    default:
-                        continue;
-                }
-                button.setText(label);
-                button.setTag(i);
-                button.setOnClickListener(this);
-            }
-        }
     }
 
 
