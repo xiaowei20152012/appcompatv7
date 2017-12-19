@@ -22,7 +22,7 @@ import android.view.View;
  * Interface for time bar views that can display a playback position, buffered position, duration
  * and ad markers, and that have a listener for scrubbing (seeking) events.
  */
-public interface TimeBar {
+public interface MXTimeBar {
 
   /**
    * @see View#isEnabled()
@@ -101,7 +101,7 @@ public interface TimeBar {
      * @param timeBar The time bar.
      * @param position The position of the scrubber, in milliseconds.
      */
-    void onScrubStart(TimeBar timeBar, long position);
+    void onScrubStart(MXTimeBar timeBar, long position);
 
     /**
      * Called when the user moves the scrubber.
@@ -109,7 +109,7 @@ public interface TimeBar {
      * @param timeBar The time bar.
      * @param position The position of the scrubber, in milliseconds.
      */
-    void onScrubMove(TimeBar timeBar, long position);
+    void onScrubMove(MXTimeBar timeBar, long position);
 
     /**
      * Called when the user stops moving the scrubber.
@@ -118,7 +118,7 @@ public interface TimeBar {
      * @param position The position of the scrubber, in milliseconds.
      * @param canceled Whether scrubbing was canceled.
      */
-    void onScrubStop(TimeBar timeBar, long position, boolean canceled);
+    void onScrubStop(MXTimeBar timeBar, long position, boolean canceled);
 
   }
 

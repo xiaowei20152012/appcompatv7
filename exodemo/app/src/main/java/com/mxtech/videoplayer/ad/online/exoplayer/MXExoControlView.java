@@ -12,13 +12,11 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.exodemo.R;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.RepeatMode;
@@ -111,7 +109,7 @@ public class MXExoControlView extends FrameLayout {
     //    private final TextView repeatToggleButton;
     private final TextView durationView;
     private final TextView positionView;
-    private final TimeBar timeBar;
+    private final MXTimeBar timeBar;
     private final StringBuilder formatBuilder;
     private final Formatter formatter;
     private final Timeline.Period period;
@@ -625,24 +623,24 @@ public class MXExoControlView extends FrameLayout {
         return true;
     }
 
-    private final class ComponentListener implements Player.EventListener, TimeBar.OnScrubListener,
+    private final class ComponentListener implements Player.EventListener, MXTimeBar.OnScrubListener,
             OnClickListener {
 
         @Override
-        public void onScrubStart(TimeBar timeBar, long position) {
+        public void onScrubStart(MXTimeBar timeBar, long position) {
             removeCallbacks(hideAction);
             scrubbing = true;
         }
 
         @Override
-        public void onScrubMove(TimeBar timeBar, long position) {
+        public void onScrubMove(MXTimeBar timeBar, long position) {
             if (positionView != null) {
                 positionView.setText(Util.getStringForTime(formatBuilder, formatter, position));
             }
         }
 
         @Override
-        public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
+        public void onScrubStop(MXTimeBar timeBar, long position, boolean canceled) {
             scrubbing = false;
             if (!canceled && player != null) {
                 seekToTimeBarPosition(position);

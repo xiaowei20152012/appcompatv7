@@ -45,7 +45,7 @@ import java.util.Locale;
 /**
  * A time bar that shows a current position, buffered position, duration and ad markers.
  */
-public class DefaultTimeBar extends View implements TimeBar {
+public class DefaultMXTimeBar extends View implements MXTimeBar {
 
   /**
    * The threshold in dps above the bar at which touch events trigger fine scrub mode.
@@ -111,7 +111,7 @@ public class DefaultTimeBar extends View implements TimeBar {
   /**
    * Creates a new time bar.
    */
-  public DefaultTimeBar(Context context, AttributeSet attrs) {
+  public DefaultMXTimeBar(Context context, AttributeSet attrs) {
     super(context, attrs);
     seekBounds = new Rect();
     progressBar = new Rect();
@@ -387,14 +387,14 @@ public class DefaultTimeBar extends View implements TimeBar {
     if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SELECTED) {
       event.getText().add(getProgressText());
     }
-    event.setClassName(DefaultTimeBar.class.getName());
+    event.setClassName(DefaultMXTimeBar.class.getName());
   }
 
   @TargetApi(21)
   @Override
   public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
     super.onInitializeAccessibilityNodeInfo(info);
-    info.setClassName(DefaultTimeBar.class.getCanonicalName());
+    info.setClassName(DefaultMXTimeBar.class.getCanonicalName());
     info.setContentDescription(getProgressText());
     if (duration <= 0) {
       return;
