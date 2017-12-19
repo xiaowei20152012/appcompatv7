@@ -34,10 +34,6 @@ import java.util.Locale;
 
 public class MXExoControlView extends FrameLayout {
 
-//    static {
-//        ExoPlayerLibraryInfo.registerModule("goog.exo.ui");
-//    }
-
     private OnClickControlListener controlListener;
 
     public interface VisibilityListener {
